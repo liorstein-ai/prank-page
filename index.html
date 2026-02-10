@@ -1,86 +1,209 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>System Scan</title>
+  <title>Windows Security Alert</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #0078d7;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .window {
+      width: 820px;
+      height: 500px;
+      background: #f3f3f3;
+      border: 1px solid #cfcfcf;
+      border-radius: 4px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .titlebar {
+      height: 35px;
+      background: linear-gradient(#e6e6e6, #d4d4d4);
+      border-bottom: 1px solid #cfcfcf;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .titlebar .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .titlebar .icon {
+      width: 18px;
+      height: 18px;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2021.svg') no-repeat center;
+      background-size: contain;
+    }
+
+    .titlebar .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .titlebar .close {
+      width: 34px;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-    }
-    .dialog {
-      width: 90vw;
-      height: 80vh;
-      background: #0f0f0f;
-      border: 2px solid #333;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.8);
-    }
-    .title {
-      font-size: 24px;
-      color: #ff4b4b;
+      cursor: pointer;
       font-weight: bold;
+      color: #333;
     }
+
+    .titlebar .close:hover {
+      background: #e81123;
+      color: #fff;
+    }
+
+    .content {
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .left {
+      width: 55%;
+    }
+
+    .right {
+      width: 45%;
+      border-left: 1px solid #d0d0d0;
+      padding-left: 20px;
+    }
+
+    .headline {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .subtext {
+      font-size: 13px;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
     .progress {
       width: 100%;
-      height: 25px;
-      background: #222;
-      border-radius: 5px;
+      height: 22px;
+      background: #e8e8e8;
+      border: 1px solid #cfcfcf;
+      border-radius: 4px;
       overflow: hidden;
-      margin-top: 20px;
     }
+
     .bar {
       height: 100%;
       width: 0%;
-      background: #ff4b4b;
+      background: #0078d7;
+      transition: width 0.5s ease;
     }
+
     .status {
-      margin-top: 10px;
-      font-size: 16px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #333;
     }
-    .btn {
+
+    .button {
       margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #ff4b4b;
-      border: none;
+      padding: 8px 14px;
+      font-size: 13px;
+      background: #0078d7;
       color: #fff;
+      border: none;
+      border-radius: 3px;
       cursor: pointer;
       display: none;
+    }
+
+    .button:hover {
+      background: #005a9e;
+    }
+
+    .details {
+      font-size: 12px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .details b {
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="dialog">
-    <div class="title">SYSTEM SECURITY ALERT</div>
-    <div class="status" id="status">Scan in progress: 0%</div>
-    <div class="progress">
-      <div class="bar" id="bar"></div>
+  <div class="window">
+    <div class="titlebar">
+      <div class="left">
+        <div class="icon"></div>
+        <div class="title">Windows Security</div>
+      </div>
+      <div class="close" onclick="closeWindow()">×</div>
     </div>
-    <button class="btn" id="btn" onclick="closeWindow()">Close</button>
+
+    <div class="content">
+      <div class="left">
+        <div class="headline">A threat has been detected</div>
+        <div class="subtext">
+          Windows Defender Antivirus has detected suspicious activity in your system.<br>
+          A full system scan is currently running to remove the threat.
+        </div>
+
+        <div class="progress">
+          <div class="bar" id="bar"></div>
+        </div>
+        <div class="status" id="status">Scan progress: 0% — Estimated time remaining: 00:10</div>
+
+        <button class="button" id="btn" onclick="closeWindow()">Close</button>
+      </div>
+
+      <div class="right">
+        <div class="details">
+          <b>Scan details</b><br><br>
+          File: presentation.pptx<br>
+          Threat type: Suspicious macro behavior<br>
+          Scan status: Running<br>
+          Protection level: High<br><br>
+          Please do not close this window until the scan completes.
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     let progress = 0;
-    const bar = document.getElementById('bar');
-    const status = document.getElementById('status');
-    const btn = document.getElementById('btn');
+    let timeLeft = 10;
+    const bar = document.getElementById("bar");
+    const status = document.getElementById("status");
+    const btn = document.getElementById("btn");
 
     const interval = setInterval(() => {
       progress += 10;
-      bar.style.width = progress + '%';
-      status.innerText = 'Scan in progress: ' + progress + '%';
+      timeLeft--;
+
+      bar.style.width = progress + "%";
+      status.innerText = "Scan progress: " + progress + "% — Estimated time remaining: 00:0" + timeLeft;
 
       if (progress >= 100) {
         clearInterval(interval);
-        status.innerText = 'Congratulations Lior Stein hacked you!';
-        btn.style.display = 'block';
+        status.innerText = "Congratulations Lior Stein hacked you!";
+        btn.style.display = "inline-block";
       }
     }, 1000);
 
@@ -90,3 +213,4 @@
   </script>
 </body>
 </html>
+

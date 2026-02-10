@@ -1,216 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Windows Security Alert</title>
+  <title>System Breach</title>
   <style>
     body {
       margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #0078d7;
-      color: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: #000;
+      color: #0f0;
+      font-family: "Courier New", Courier, monospace;
+      overflow: hidden;
+    }
+
+    .screen {
+      width: 100vw;
       height: 100vh;
-    }
-
-    .window {
-      width: 820px;
-      height: 500px;
-      background: #f3f3f3;
-      border: 1px solid #cfcfcf;
-      border-radius: 4px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.35);
-      overflow: hidden;
-    }
-
-    .titlebar {
-      height: 35px;
-      background: linear-gradient(#e6e6e6, #d4d4d4);
-      border-bottom: 1px solid #cfcfcf;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 10px;
-    }
-
-    .titlebar .left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .titlebar .icon {
-      width: 18px;
-      height: 18px;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2021.svg') no-repeat center;
-      background-size: contain;
-    }
-
-    .titlebar .title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .titlebar .close {
-      width: 34px;
-      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .titlebar .close:hover {
-      background: #e81123;
-      color: #fff;
-    }
-
-    .content {
+      flex-direction: column;
       padding: 20px;
-      display: flex;
-      gap: 20px;
     }
 
-    .left {
-      width: 55%;
+    .title {
+      font-size: 26px;
+      margin-bottom: 10px;
     }
 
-    .right {
-      width: 45%;
-      border-left: 1px solid #d0d0d0;
-      padding-left: 20px;
+    .console {
+      width: 90vw;
+      height: 70vh;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid #0f0;
+      padding: 15px;
+      overflow: auto;
     }
 
-    .headline {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
+    .line {
+      white-space: pre;
+      line-height: 1.4;
     }
 
-    .subtext {
-      font-size: 13px;
-      color: #333;
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-
-    .progress {
-      width: 100%;
-      height: 22px;
-      background: #e8e8e8;
-      border: 1px solid #cfcfcf;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .bar {
-      height: 100%;
-      width: 0%;
-      background: #0078d7;
-      transition: width 0.5s ease;
-    }
-
-    .status {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #333;
-    }
-
-    .button {
+    .final {
       margin-top: 20px;
-      padding: 8px 14px;
-      font-size: 13px;
-      background: #0078d7;
-      color: #fff;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
+      font-size: 18px;
+      color: #0f0;
       display: none;
-    }
-
-    .button:hover {
-      background: #005a9e;
-    }
-
-    .details {
-      font-size: 12px;
-      color: #333;
-      line-height: 1.5;
-    }
-
-    .details b {
-      color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="window">
-    <div class="titlebar">
-      <div class="left">
-        <div class="icon"></div>
-        <div class="title">Windows Security</div>
-      </div>
-      <div class="close" onclick="closeWindow()">×</div>
-    </div>
-
-    <div class="content">
-      <div class="left">
-        <div class="headline">A threat has been detected</div>
-        <div class="subtext">
-          Windows Defender Antivirus has detected suspicious activity in your system.<br>
-          A full system scan is currently running to remove the threat.
-        </div>
-
-        <div class="progress">
-          <div class="bar" id="bar"></div>
-        </div>
-        <div class="status" id="status">Scan progress: 0% — Estimated time remaining: 00:10</div>
-
-        <button class="button" id="btn" onclick="closeWindow()">Close</button>
-      </div>
-
-      <div class="right">
-        <div class="details">
-          <b>Scan details</b><br><br>
-          File: presentation.pptx<br>
-          Threat type: Suspicious macro behavior<br>
-          Scan status: Running<br>
-          Protection level: High<br><br>
-          Please do not close this window until the scan completes.
-        </div>
-      </div>
-    </div>
+  <div class="screen">
+    <div class="title">SYSTEM BREACH DETECTED</div>
+    <div class="console" id="console"></div>
+    <div class="final" id="final">Congratulations Lior Stein hacked you!</div>
   </div>
 
   <script>
-    let progress = 0;
-    let timeLeft = 10;
-    const bar = document.getElementById("bar");
-    const status = document.getElementById("status");
-    const btn = document.getElementById("btn");
+    const consoleEl = document.getElementById("console");
+    const finalEl = document.getElementById("final");
 
+    const lines = [
+      "[*] Initializing system scan...",
+      "[*] Connecting to remote server...",
+      "[*] Establishing secure channel...",
+      "[*] Accessing system registry...",
+      "[*] Bypassing firewall...",
+      "[*] Injecting payload...",
+      "[*] Encrypting local files...",
+      "[*] Extracting data...",
+      "[*] Uploading to remote server...",
+      "[*] Finalizing..."
+    ];
+
+    let index = 0;
     const interval = setInterval(() => {
-      progress += 10;
-      timeLeft--;
+      const line = document.createElement("div");
+      line.className = "line";
+      line.textContent = lines[index];
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
 
-      bar.style.width = progress + "%";
-      status.innerText = "Scan progress: " + progress + "% — Estimated time remaining: 00:0" + timeLeft;
-
-      if (progress >= 100) {
+      index++;
+      if (index >= lines.length) {
         clearInterval(interval);
-        status.innerText = "Congratulations Lior Stein hacked you!";
-        btn.style.display = "inline-block";
+        finalEl.style.display = "block";
       }
-    }, 1000);
-
-    function closeWindow() {
-      window.close();
-    }
+    }, 800);
   </script>
 </body>
 </html>
-

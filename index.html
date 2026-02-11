@@ -25,13 +25,13 @@
       height: 100vh;
       overflow-y: auto;
       font-size: 16px;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(2px);
+      background: rgba(0,0,0,0.3);
     }
 
     .line {
       white-space: pre;
       line-height: 1.4;
+      animation: fadeIn 0.3s ease-in;
     }
 
     .cursor {
@@ -54,26 +54,9 @@
       50% { opacity: 0; }
     }
 
-    /* Glitch effect */
-    .glitch {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 3;
-      pointer-events: none;
-      opacity: 0;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="400" height="400" filter="url(%23noise)" opacity="0.4"/></svg>');
-      mix-blend-mode: screen;
-    }
-
-    @keyframes glitchFlicker {
-      0% { opacity: 0; transform: translate(0,0); }
-      25% { opacity: 0.4; transform: translate(-2px, 2px); }
-      50% { opacity: 0.1; transform: translate(2px, -2px); }
-      75% { opacity: 0.35; transform: translate(-1px, 1px); }
-      100% { opacity: 0; transform: translate(0,0); }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -85,12 +68,11 @@
   <div id="typingLine"></div>
 </div>
 
-<div class="glitch" id="glitch"></div>
-
 <script>
-  // MATRIX BACKGROUND
+  // MATRIX BACKGROUND EFFECT
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
+
   canvas.height = window.innerHeight;
   canvas.width = window.innerWidth;
 
@@ -98,11 +80,13 @@
   const fontSize = 14;
   const columns = canvas.width / fontSize;
   const drops = [];
+
   for (let x = 0; x < columns; x++) drops[x] = 1;
 
   function drawMatrix() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     ctx.fillStyle = "#0F0";
     ctx.font = fontSize + "px monospace";
 
@@ -110,80 +94,43 @@
       const text = letters.charAt(Math.floor(Math.random() * letters.length));
       ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+        drops[i] = 0;
+
       drops[i]++;
     }
   }
+
   setInterval(drawMatrix, 33);
 
-  // TERMINAL TEXT + HACKERTYPER STYLE
+  // HACKERTYPER STYLE TERMINAL
   const terminal = document.getElementById("terminal");
   const typingLine = document.getElementById("typingLine");
 
   const text =
-    "root@system:~$ sudo breach --init\n" +
-    "Password: ********\n" +
-    "Authenticating...\n" +
-    "Access granted.\n" +
-    "\n" +
-    "root@system:~$ nmap -sS 192.168.1.0/24\n" +
-    "Starting Nmap 7.80 ( https://nmap.org )\n" +
-    "Scan report for 192.168.1.1\n" +
-    "Host is up (0.00015s latency).\n" +
-    "Not shown: 998 closed ports\n" +
-    "PORT   STATE SERVICE\n" +
-    "22/tcp open  ssh\n" +
-    "80/tcp open  http\n" +
-    "\n" +
-    "root@system:~$ exploit --target 192.168.1.1\n" +
-    "Connecting...\n" +
-    "Payload injected.\n" +
-    "SYSTEM COMPROMISED\n" +
+    "> Connecting to secure server...\n" +
+    "> Bypassing firewall...\n" +
+    "> Accessing system files...\n" +
+    "> Implanting payload...\n" +
+    "> Virus implanted successfully...\n" +
+    "> System breach complete...\n" +
+    "> ACCESS GRANTED\n" +
     "\n" +
     "Congratulations Lior Stein hacked you!";
 
-  // sound
-  const typeSound = new Audio("https://cdn.jsdelivr.net/gh/terkelg/awesome-remote-job@master/images/typing.mp3");
-  typeSound.volume = 0.08;
-
   let index = 0;
-  let soundTimer = 0;
 
   function type() {
     if (index < text.length) {
       typingLine.textContent += text.charAt(index);
       index++;
 
-      // play typing sound
-      soundTimer++;
-      if (soundTimer % 3 === 0) {
-        typeSound.currentTime = 0;
-        typeSound.play().catch(() => {});
-      }
-
-      // random speed like hackertyper
-      const delay = Math.random() * 30;
+      // speed similar to hackertyper
+      setTimeout(type, Math.random() * 25);
       terminal.scrollTop = terminal.scrollHeight;
-
-      // occasional glitch effect
-      if (Math.random() < 0.03) {
-        const glitch = document.getElementById("glitch");
-        glitch.style.animation = "glitchFlicker 0.6s ease-in-out forwards";
-        setTimeout(() => glitch.style.animation = "", 600);
-      }
-
-      setTimeout(type, delay);
     }
   }
 
-  // start typing on key press (hackertyper style)
-  document.addEventListener("keydown", () => {
-    if (index < text.length) {
-      type();
-    }
-  });
-
-  // auto start typing for effect
   type();
 </script>
 

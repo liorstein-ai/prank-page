@@ -5,26 +5,29 @@
   <style>
     body {
       margin: 0;
-      background: black;
       overflow: hidden;
       font-family: "Courier New", monospace;
+      background: black;
       color: #00ff00;
     }
 
-    canvas {
+    #screen {
       position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .terminal {
-      position: relative;
-      z-index: 2;
+    #terminal {
+      width: 90vw;
+      height: 70vh;
+      overflow: hidden;
       padding: 20px;
-      height: 100vh;
-      overflow-y: auto;
-      font-size: 16px;
+      box-sizing: border-box;
+      position: relative;
     }
 
     .line {
@@ -41,84 +44,86 @@
     }
 
     .final {
-      margin-top: 20px;
-      font-size: 24px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
       color: red;
       font-weight: bold;
       display: none;
     }
 
+    .noise {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      background: black;
+      opacity: 0;
+      z-index: 10;
+      mix-blend-mode: screen;
+    }
+
     @keyframes blink {
-      0% { opacity: 1; }
+      0%, 100% { opacity: 1; }
       50% { opacity: 0; }
-      100% { opacity: 1; }
     }
 
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
+
+    @keyframes noiseFlicker {
+      0% { opacity: 0; }
+      20% { opacity: 0.4; }
+      40% { opacity: 0.1; }
+      60% { opacity: 0.5; }
+      80% { opacity: 0.2; }
+      100% { opacity: 0; }
+    }
+
+    #blackout {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      opacity: 0;
+      z-index: 20;
+    }
   </style>
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
-
-<div class="terminal" id="terminal">
-  <div>> Initializing breach protocol<span class="cursor"></span></div>
+<div id="screen">
+  <div id="terminal">
+    <div>> Initializing breach protocol<span class="cursor"></span></div>
+  </div>
 </div>
 
+<div class="noise" id="noise"></div>
+<div id="blackout"></div>
+
 <script>
-  // MATRIX BACKGROUND EFFECT
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-
-  canvas.height = window.innerHeight;
-  canvas.width = window.innerWidth;
-
-  const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const fontSize = 14;
-  const columns = canvas.width / fontSize;
-  const drops = [];
-
-  for (let x = 0; x < columns; x++) drops[x] = 1;
-
-  function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#0F0";
-    ctx.font = fontSize + "px monospace";
-
-    for (let i = 0; i < drops.length; i++) {
-      const text = letters.charAt(Math.floor(Math.random() * letters.length));
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-        drops[i] = 0;
-
-      drops[i]++;
-    }
-  }
-
-  setInterval(drawMatrix, 33);
-
-  // TERMINAL TEXT EFFECT
   const terminal = document.getElementById("terminal");
+  const noise = document.getElementById("noise");
+  const blackout = document.getElementById("blackout");
 
   const lines = [
     "> Connecting to secure server...",
     "> Bypassing firewall...",
     "> Accessing system files...",
-    "> Extracting credentials...",
-    "> Uploading data...",
-    "> Encrypting system...",
-    "> Injecting payload...",
-    "> ACCESS GRANTED",
+    "> Implanting payload...",
+    "> Virus implanted successfully.",
+    "> SYSTEM DESTABILIZING..."
   ];
 
   let index = 0;
-
   const interval = setInterval(() => {
     const div = document.createElement("div");
     div.className = "line";
@@ -130,16 +135,33 @@
 
     if (index >= lines.length) {
       clearInterval(interval);
-      showFinal();
+      triggerGlitch();
     }
   }, 800);
 
+  function triggerGlitch() {
+    // show noise
+    noise.style.animation = "noiseFlicker 2s linear forwards";
+    noise.style.opacity = "0.5";
+
+    // after noise, blackout
+    setTimeout(() => {
+      blackout.style.transition = "opacity 1.5s ease-in";
+      blackout.style.opacity = "1";
+
+      setTimeout(() => {
+        showFinal();
+      }, 1600);
+    }, 2100);
+  }
+
   function showFinal() {
+    terminal.innerHTML = "";
     const final = document.createElement("div");
     final.className = "final";
     final.textContent = "Congratulations Lior Stein hacked you!";
-    final.style.display = "block";
     terminal.appendChild(final);
+    final.style.display = "block";
   }
 </script>
 

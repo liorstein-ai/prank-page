@@ -5,87 +5,143 @@
   <style>
     body {
       margin: 0;
-      background: #000;
-      color: #0f0;
-      font-family: "Courier New", Courier, monospace;
+      background: black;
       overflow: hidden;
+      font-family: "Courier New", monospace;
+      color: #00ff00;
     }
 
-    .screen {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .terminal {
+      position: relative;
+      z-index: 2;
       padding: 20px;
-    }
-
-    .title {
-      font-size: 26px;
-      margin-bottom: 10px;
-    }
-
-    .console {
-      width: 90vw;
-      height: 70vh;
-      background: rgba(0,0,0,0.8);
-      border: 1px solid #0f0;
-      padding: 15px;
-      overflow: auto;
+      height: 100vh;
+      overflow-y: auto;
+      font-size: 16px;
     }
 
     .line {
       white-space: pre;
       line-height: 1.4;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #00ff00;
+      animation: blink 1s infinite;
     }
 
     .final {
       margin-top: 20px;
-      font-size: 18px;
-      color: #0f0;
+      font-size: 24px;
+      color: red;
+      font-weight: bold;
       display: none;
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div class="screen">
-    <div class="title">SYSTEM BREACH DETECTED</div>
-    <div class="console" id="console"></div>
-    <div class="final" id="final">Congratulations Lior Stein hacked you!</div>
-  </div>
 
-  <script>
-    const consoleEl = document.getElementById("console");
-    const finalEl = document.getElementById("final");
+<canvas id="matrix"></canvas>
 
-    const lines = [
-      "[*] Initializing system scan...",
-      "[*] Connecting to remote server...",
-      "[*] Establishing secure channel...",
-      "[*] Accessing system registry...",
-      "[*] Bypassing firewall...",
-      "[*] Injecting payload...",
-      "[*] Encrypting local files...",
-      "[*] Extracting data...",
-      "[*] Uploading to remote server...",
-      "[*] Finalizing..."
-    ];
+<div class="terminal" id="terminal">
+  <div>> Initializing breach protocol<span class="cursor"></span></div>
+</div>
 
-    let index = 0;
-    const interval = setInterval(() => {
-      const line = document.createElement("div");
-      line.className = "line";
-      line.textContent = lines[index];
-      consoleEl.appendChild(line);
-      consoleEl.scrollTop = consoleEl.scrollHeight;
+<script>
+  // MATRIX BACKGROUND EFFECT
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
 
-      index++;
-      if (index >= lines.length) {
-        clearInterval(interval);
-        finalEl.style.display = "block";
-      }
-    }, 800);
-  </script>
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+
+  const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = [];
+
+  for (let x = 0; x < columns; x++) drops[x] = 1;
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#0F0";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters.charAt(Math.floor(Math.random() * letters.length));
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+        drops[i] = 0;
+
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 33);
+
+  // TERMINAL TEXT EFFECT
+  const terminal = document.getElementById("terminal");
+
+  const lines = [
+    "> Connecting to secure server...",
+    "> Bypassing firewall...",
+    "> Accessing system files...",
+    "> Extracting credentials...",
+    "> Uploading data...",
+    "> Encrypting system...",
+    "> Injecting payload...",
+    "> ACCESS GRANTED",
+  ];
+
+  let index = 0;
+
+  const interval = setInterval(() => {
+    const div = document.createElement("div");
+    div.className = "line";
+    div.textContent = lines[index];
+    terminal.appendChild(div);
+    terminal.scrollTop = terminal.scrollHeight;
+
+    index++;
+
+    if (index >= lines.length) {
+      clearInterval(interval);
+      showFinal();
+    }
+  }, 800);
+
+  function showFinal() {
+    const final = document.createElement("div");
+    final.className = "final";
+    final.textContent = "Congratulations Lior Stein hacked you!";
+    final.style.display = "block";
+    terminal.appendChild(final);
+  }
+</script>
+
 </body>
 </html>
